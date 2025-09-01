@@ -3,12 +3,15 @@ replicaCount: 1
 app:
   image:
     repository: 533260833584.dkr.ecr.us-east-1.amazonaws.com/acceleraterapp
-    tag: alpha-latest   # update with your actual Next.js image tag
+    tag: alpha-latest   # Update with your actual Next.js image tag
     pullPolicy: IfNotPresent
   containerPort: 3000
+  env:
+    - name: PORT
+      value: "3000"
   envFrom:
-    - secretProviderClass:
-        name: rds-db-secret-provider   # Use the SecretProviderClass here
+    - secretRef:
+        name: rds-secrets   # The Kubernetes Secret synced from rds-db-secret-provider
   service:
     type: ClusterIP
     port: 3000
@@ -23,7 +26,7 @@ ingress:
   annotations:
     kubernetes.io/ingress.class: nginx
   hosts:
-    - host: gitaction.dev.stackgenie.io   # replace with your real domain
+    - host: gitaction.dev.stackgenie.io   # Replace with your real domain
       paths:
         - path: /
           pathType: Prefix
@@ -33,3 +36,4 @@ ingress:
               port:
                 number: 3000
   tls: []
+
